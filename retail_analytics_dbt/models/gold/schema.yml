@@ -1,0 +1,176 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: |
+      Dimension temporelle contenant tous les jours de la période d'analyse.
+      Permet de faire des analyses temporelles riches avec granularité au jour.
+    columns:
+      - name: date_id
+        description: "Clé primaire - Date au format DATE"
+        tests:
+          - not_null
+          - unique
+      - name: annee
+        description: "Année (ex: 2024)"
+      - name: mois_numero
+        description: "Numéro du mois (1-12)"
+      - name: mois_nom
+        description: "Nom du mois (ex: Janvier)"
+      - name: trimestre
+        description: "Numéro du trimestre (1-4)"
+      - name: jour_semaine_nom
+        description: "Nom du jour (ex: Lundi)"
+      - name: est_weekend
+        description: "Indicateur weekend (TRUE/FALSE)"
+
+  - name: dim_client
+    description: |
+      Dimension des clients avec leurs informations géographiques.
+      Utilise une clé de substitution (surrogate key) pour la jointure.
+    columns:
+      - name: id_client
+        description: "Identifiant naturel du client"
+        tests:
+          - not_null
+          - unique
+      - name: nom_client
+        description: "Nom du client"
+      - name: segment
+        description: "Segment client (Consumer, Corporate, Home Office)"
+      - name: ville
+        description: "Ville du client"
+      - name: region
+        description: "Région du client"
+      - name: pays
+        description: "Pays du client"
+      - name: zone_geographique
+        description: "Zone géographique (Europe, Amérique, etc.)"
+
+  - name: dim_produit
+    description: |
+      Dimension des produits avec hiérarchie catégorielle.
+      Contient les attributs descriptifs pour l'analyse produit.
+    columns:
+      - name: id_produit
+        description: "Identifiant naturel du produit"
+        tests:
+          - not_null
+          - unique
+      - name: nom_produit
+        description: "Nom commercial du produit"
+      - name: categorie
+        description: "Catégorie principale du produit"
+      - name: sous_categorie
+        description: "Sous-catégorie du produit"
+  
+  - name: dim_commande
+    description: |
+      Dimension des commandes avec les dates et modes d'expedition.
+      Contient les attributs descriptifs pour l'analyse commandes.
+    columns:
+      - name: id_commande
+        description: "Clé primaire - de la commande"
+        tests:
+          - not_null
+          - unique
+      - name: date_commande
+        description: "Date de paimement de la commande"
+      - name: date_expedition
+        description: "Date de reception de la commande par le client"
+      - name: mode_expedition
+        description: "Mode d'expedition de la commande"
+      - name: delai_expedition_jours
+        description: "le nombre de jours entre la date de commade et la reception de la commande"
+
+  - name: faits_ventes
+    description: |
+      Table de faits centrale contenant toutes les lignes de commande.
+      Grain: Une ligne par ligne de commande (un produit dans une commande).
+      Connecte aux dimensions date, client et produit.
+      Inclut les objectifs et les KPIs calculés.
+    columns:
+      - name: vente_key
+        description: "Clé primaire - Hash unique de la ligne de commande (id_ligne)"
+        tests:
+          - not_null
+          - unique
+      
+      - name: date_key
+        description: "Clé étrangère vers dim_date (date de commande)"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_id
+      
+      - name: id_client
+        description: "Clé étrangère vers dim_client"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_client')
+              field: id_client
+      
+      - name: id_produit
+        description: "Clé étrangère vers dim_produit"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_produit')
+              field: id_produit
+      
+      - name: id_commande
+        description: "Identifiant de la commande (degenerate dimension)"
+      
+      - name: montant_ventes
+        description: "Montant des ventes (CA) - mesure additive principale"
+        tests:
+          - not_null
+      
+      - name: quantite
+        description: "Quantité commandée - mesure additive"
+        tests:
+          - not_null
+      
+      - name: profit
+        description: "Profit réalisé - mesure additive"
+      
+      - name: prix_unitaire
+        description: "Prix unitaire du produit - mesure semi-additive"
+      
+      - name: remise
+        description: "Taux de remise appliqué (0 à 1) - mesure semi-additive"
+      
+      - name: marge_pct
+        description: "Pourcentage de marge (profit/ventes * 100)"
+      
+      - name: objectif_vente
+        description: "Objectif de vente pour le mois/catégorie/segment"
+      
+      - name: taux_atteinte_objectif_pct
+        description: "% d'atteinte de l'objectif ((réalisé/objectif)*100)"
+      
+      - name: ecart_objectif
+        description: "Ecart en valeur absolue entre réalisé et objectif"
+      
+      - name: delai_expedition_jours
+        description: "Délai entre commande et expédition en jours"
+      
+      - name: flag_perte
+        description: "Indicateur de vente à perte (profit < 0)"
+      
+      - name: flag_forte_remise
+        description: "Indicateur de forte remise (>= 50%)"
+      
+      - name: flag_avec_remise
+        description: "Indicateur de présence d'une remise"
+      
+      - name: flag_sans_objectif
+        description: "Indicateur absence d'objectif pour cette ligne"
+      
+      - name: mode_expedition
+        description: "Mode d'expédition utilisé"
+      
+      - name: date_expedition
+        description: "Date d'expédition de la commande"

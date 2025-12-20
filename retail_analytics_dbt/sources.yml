@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+  - name: raw_azure
+    description: "Données brutes depuis Azure Blob Storage via external stage Snowflake"
+    database: coms_data
+    schema: bronze  # Schema où sont les stages/tables externes
+    
+    tables:
+      - name: raw_hypermarche_stage
+        description: "Stage externe pointant vers hypermarche.csv sur Azure Blob"
+        external:
+          location: "@azure_stage/Hypermarche.csv"
+          file_format: csv_format
+      
+      - name: raw_objectifs_stage
+        description: "Stage externe pointant vers ventes.csv sur Azure Blob"
+        external:
+          location: "@azure_stage/Objectifs_ventes.csv"
+          file_format: csv_format

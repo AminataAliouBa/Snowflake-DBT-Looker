@@ -1,0 +1,133 @@
+version: 2
+
+models:
+  - name: bronze_hypermarche
+    description: |
+      Données brutes des commandes e-commerce chargées depuis Azure Blob Storage.
+      Table Bronze 1:1 avec le fichier source hypermarche.csv.
+      Modèle incrémental pour ne charger que les nouvelles données.
+    config:
+      materialized: incremental
+      unique_key: id_ligne
+    columns:
+      - name: id_ligne
+        description: "Identifiant unique de la ligne de commande"
+        tests:
+          - not_null
+          - unique
+      
+      - name: id_commande
+        description: "Identifiant de la commande"
+        tests:
+          - not_null
+      
+      - name: date_commande
+        description: "Date de la commande"
+        tests:
+          - not_null
+      
+      - name: date_expedition
+        description: "Date d'expédition"
+      
+      - name: mode_expedition
+        description: "Mode d'expédition (Standard, Express, etc.)"
+      
+      - name: id_client
+        description: "Identifiant du client"
+        tests:
+          - not_null
+      
+      - name: nom_client
+        description: "Nom du client"
+      
+      - name: segment
+        description: "Segment client (Consumer, Corporate, Home Office)"
+      
+      - name: ville
+        description: "Ville du client"
+      
+      - name: region
+        description: "Région du client"
+      
+      - name: pays
+        description: "Pays du client"
+      
+      - name: zone_geographique
+        description: "Zone géographique"
+      
+      - name: id_produit
+        description: "Identifiant du produit"
+        tests:
+          - not_null
+      
+      - name: categorie
+        description: "Catégorie du produit"
+      
+      - name: sous_categorie
+        description: "Sous-catégorie du produit"
+      
+      - name: nom_produit
+        description: "Nom du produit"
+      
+      - name: montant_ventes
+        description: "Montant des ventes (CA)"
+        tests:
+          - not_null
+      
+      - name: quantite
+        description: "Quantité commandée"
+        tests:
+          - not_null
+      
+      - name: remise
+        description: "Taux de remise (0 à 1)"
+      
+      - name: profit
+        description: "Profit réalisé"
+      
+      - name: _loaded_at
+        description: "Timestamp de chargement dans Snowflake"
+      
+      - name: _source_file
+        description: "Nom du fichier source"
+      
+      - name: _file_row_number
+        description: "Numéro de ligne dans le fichier source"
+
+  - name: bronze_objectifs_ventes
+    description: |
+      Objectifs de ventes par catégorie, date et segment.
+      Chargés depuis ventes.csv sur Azure Blob.
+      Modèle incrémental.
+    config:
+      materialized: incremental
+      unique_key: ['categorie', 'date_commande', 'segment']
+    columns:
+      - name: categorie
+        description: "Catégorie de produit"
+        tests:
+          - not_null
+      
+      - name: date_commande
+        description: "Date de l'objectif"
+        tests:
+          - not_null
+      
+      - name: segment
+        description: "Segment client"
+        tests:
+          - not_null
+      
+      - name: objectif_vente
+        description: "Objectif de vente (CA)"
+        tests:
+          - not_null
+      
+      - name: _loaded_at
+        description: "Timestamp de chargement"
+      
+      - name: _source_file
+        description: "Nom du fichier source"
+      
+      - name: _file_row_number
+        description: "Numéro de ligne dans le fichier source"
