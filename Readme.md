@@ -2,9 +2,9 @@
 
 ## Vue d'Ensemble
 
-**Projet**: Data Warehouse E-commerce avec DBT & Snowflake et Loocker 
+**Projet**: Data Warehouse E-commerce avec DBT & Snowflake et Looker 
 **Domaine**: Analyse des ventes retail multi-segments  
-**Stack**: Snowflake + DBT + Azure Blob + Git + Loocker 
+**Stack**: Snowflake + DBT + Azure Blob + Git + Looker 
 
 ---
 
@@ -32,5 +32,5 @@
 Schema étoile
 ![schema DAG](DAG.png)
 
-# Dashboard => KPI Analytics sur Loocker Studio
+# Dashboard => KPI Analytics sur Looker Studio
 https://lookerstudio.google.com/reporting/845fc28d-1a8f-4076-a777-1b78b0813534
