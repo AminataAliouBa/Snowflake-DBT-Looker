@@ -34,5 +34,5 @@ Schema étoile
 
 # Dashboard => KPI Analytics sur Looker Studio
 https://lookerstudio.google.com/reporting/845fc28d-1a8f-4076-a777-1b78b0813534
-![schema DAG](Capture d'écran 2025-12-21 211641.png)
-![schema DAG](Capture d'écran 2025-12-21 211723.png)
+![schema DAG](page1.png)
+![schema DAG](page2.png)
