@@ -7,7 +7,7 @@
 }}
 
 SELECT DISTINCT
-    id_client, -- natural key
+    id_client, 
     nom_client,
     segment,
     ville,
